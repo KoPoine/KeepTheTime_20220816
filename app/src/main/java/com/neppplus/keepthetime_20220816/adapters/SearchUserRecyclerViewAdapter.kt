@@ -4,12 +4,15 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.neppplus.keepthetime_20220816.R
 import com.neppplus.keepthetime_20220816.datas.UserData
+
+// [도전과제] SearchUserRecyclerViewAdapter & FriendRecyclerViewAdapter 합쳐보자
 
 class SearchUserRecyclerViewAdapter(
     val mContext : Context, val mList : List<UserData>
@@ -21,7 +24,9 @@ class SearchUserRecyclerViewAdapter(
             val profileImg = itemView.findViewById<ImageView>(R.id.profileImg)
             val nickTxt = itemView.findViewById<TextView>(R.id.nickTxt)
             val emailTxt = itemView.findViewById<TextView>(R.id.emailTxt)
+            val addFriendBtn = itemView.findViewById<Button>(R.id.addFriendBtn)
 
+            addFriendBtn.visibility = View.VISIBLE
             Glide.with(mContext).load(item.profileImg).into(profileImg)
             nickTxt.text = item.nickname
             when (item.provider) {

@@ -84,9 +84,38 @@ class SignUpActivity : BaseActivity() {
 
 
         }
+
+//        이메일 중복 확인 버튼
+        binding.emailDupBtn.setOnClickListener {
+            val inputEmail = binding.emailEdt.text.toString()
+            dupCheck("EMAIL", inputEmail)
+        }
+
+//        닉네임 중복 확인 버튼
+        binding.nickDupBtn.setOnClickListener {
+            val inputNick = binding.nickEdt.text.toString()
+            dupCheck("NICK_NAME", inputNick)
+        }
     }
 
     override fun setValues() {
 
+    }
+
+    fun dupCheck(type: String, value : String) {
+        apiList.getRequestDupCheck(type, value).enqueue(object : Callback<BasicResponse>{
+            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                if (response.isSuccessful) {
+                    when(type) {
+                        "EMAIL" -> {}
+                        "NICK_NAME" -> {}
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+            }
+        })
     }
 }

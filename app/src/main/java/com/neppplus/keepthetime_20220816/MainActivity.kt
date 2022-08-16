@@ -3,6 +3,7 @@ package com.neppplus.keepthetime_20220816
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.viewpager2.widget.ViewPager2
 import com.neppplus.keepthetime_20220816.adapters.MainViewPagerAdapter
 import com.neppplus.keepthetime_20220816.databinding.ActivityMainBinding
 
@@ -29,6 +30,23 @@ class MainActivity : BaseActivity() {
             }
             return@setOnItemSelectedListener true
         }
+
+//        뷰페이저 페이지 이동 > 바텀 네비게이션의 메뉴 선택
+
+        binding.mainViewPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback(){
+//                추상 메쏘드 X. 이벤트 처리 함수를 직접 오버라이딩
+
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+
+                    binding.bottomNav.selectedItemId = when (position) {
+                        0 -> R.id.myAppointment
+                        1 -> R.id.invitedAppointment
+                        else -> R.id.setting
+                    }
+                }
+            })
     }
 
     override fun setValues() {

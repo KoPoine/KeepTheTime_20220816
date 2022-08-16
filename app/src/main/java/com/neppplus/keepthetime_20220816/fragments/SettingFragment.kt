@@ -2,16 +2,21 @@ package com.neppplus.keepthetime_20220816.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.neppplus.keepthetime_20220816.LoginActivity
 import com.neppplus.keepthetime_20220816.R
 import com.neppplus.keepthetime_20220816.databinding.FragmentSettingBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
@@ -50,7 +55,6 @@ class SettingFragment : BaseFragment() {
     override fun setupEvents() {
 
 //        프로필 이미지 변경 이벤트 처리
-
         binding.profileImg.setOnClickListener {
 
 //            이미지 조회 권한 확인 (Read_External_Storage)
@@ -74,6 +78,116 @@ class SettingFragment : BaseFragment() {
                 .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .check()
 
+        }
+
+//        닉네임 변경 이벤트 처리
+        binding.nickTxt.setOnClickListener {
+            val customView = LayoutInflater.from(mContext).inflate(R.layout.custom_alert_dialog, null)
+
+            val alert = AlertDialog.Builder(mContext)
+                .setTitle("닉네임 변경")
+                .setView(customView)
+                .setPositiveButton("확인", DialogInterface.OnClickListener { dialogInterface, i ->
+//                    customView에 있는 inputEdt를 찾아와서 그 내용값을 inputNick에 담아서 서버로 전달
+//                    1. customView에 있는 inputEdt 찾아오기
+                    val inputEdt = customView.findViewById<EditText>(R.id.inputEdt)
+
+//                    2. inputNick 변수 생성 > EditText값을 대입 (inputNick이 공백일 경우 toast 전달 및 ClickListener 탈출)
+                    val inputNick = inputEdt.text.toString()
+
+                    val token = ContextUtil.getLoginToken(mContext)
+                    apiList.patchRequestEditUserData(token, "nickname", inputNick)
+                        .enqueue(object : Callback<BasicResponse> {
+                            override fun onResponse(
+                                call: Call<BasicResponse>,
+                                response: Response<BasicResponse>
+                            ) {
+                                if (response.isSuccessful) {
+                                    Toast.makeText(mContext, "닉네임이 변경되었습니다.", Toast.LENGTH_SHORT)
+                                        .show()
+                                    GlobalData.loginUser = response.body()!!.data.user
+
+                                    binding.nickTxt.text = GlobalData.loginUser!!.nickname
+                                }
+
+                            }
+
+                            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+                            }
+                        })
+                })
+                .setNegativeButton("취소", null)
+                .show()
+        }
+
+//        [응용 문제] 준비 시간 변경 이벤트 처리
+        binding.changeReadyMinuteLayout.setOnClickListener {
+//            [도전 과제] 사용자가 입력한 준비 시간이 만약 60분이 넘을 경우 -> ~시간 ~분으로 표시
+        }
+
+//        비밀번호 변경 이벤트 처리
+        binding.changePwLayout.setOnClickListener {
+            val customView = LayoutInflater.from(mContext).inflate(R.layout.custom_alert_dialog, null)
+
+            val inputEdt = customView.findViewById<EditText>(R.id.inputEdt)
+            val passwordLayout = customView.findViewById<LinearLayout>(R.id.passwordLayout)
+            val currentPwEdt = customView.findViewById<EditText>(R.id.currentPwEdt)
+            val newPwEdt = customView.findViewById<EditText>(R.id.newPwEdt)
+
+            passwordLayout.visibility = View.VISIBLE
+            inputEdt.visibility = View.GONE
+
+            val alert = AlertDialog.Builder(mContext)
+                .setTitle("비밀번호 변경")
+                .setMessage("비밀번호 변경을 위해서는\n현재 비밀번호가 일치해야 합니다.")
+                .setView(customView)
+                .setPositiveButton("확인", DialogInterface.OnClickListener { dialogInterface, i ->
+//                    비밀번호 EditText가 들어있는 Layout의 visibility & 기존의 EditText의 visibility 변경
+
+                    val currentPw = currentPwEdt.text.toString()
+                    val newPw = newPwEdt.text.toString()
+
+                    val token = ContextUtil.getLoginToken(mContext)
+                    apiList.patchRequestChangePassword(token, currentPw, newPw)
+                        .enqueue(object : Callback<BasicResponse> {
+                            override fun onResponse(
+                                call: Call<BasicResponse>,
+                                response: Response<BasicResponse>
+                            ) {
+                                if (response.isSuccessful) {
+                                    Toast.makeText(mContext, "비밀번호가 변경되었습니다.", Toast.LENGTH_SHORT)
+                                        .show()
+
+                                    ContextUtil.setLoginToken(mContext, response.body()!!.data.token)
+                                }
+
+                            }
+
+                            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+                            }
+                        })
+                })
+                .setNegativeButton("취소", null)
+                .show()
+        }
+
+//        로그아웃
+        binding.logoutLayout.setOnClickListener {
+            ContextUtil.setLoginToken(mContext, "")
+
+            GlobalData.loginUser = null
+
+            val myIntent = Intent(mContext, LoginActivity::class.java)
+            myIntent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(myIntent)
+
+//            Fragment에서는 기존의 Activity를 종료할 수 없다.(Activity를 찾아와야...=> requireActivity())
+            requireActivity().finish()
+
+//            requireActivity().finishAffinity()
         }
 
     }

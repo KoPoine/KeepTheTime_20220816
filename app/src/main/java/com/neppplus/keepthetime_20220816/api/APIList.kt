@@ -40,4 +40,20 @@ interface APIList {
         @Part img : MultipartBody.Part
     ): Call<BasicResponse>
 
+    @FormUrlEncoded
+    @PATCH("/user")
+    fun patchRequestEditUserData(
+        @Header("X-Http-Token") token: String,
+        @Field("field") field: String,
+        @Field("value") value: String
+    ): Call<BasicResponse>
+
+    @FormUrlEncoded
+    @PATCH("/user/password")
+    fun patchRequestChangePassword(
+        @Header("X-Http-Token") token: String,
+        @Field("current_password") currentPw: String,
+        @Field("new_password") newPw: String
+    ): Call<BasicResponse>
+
 }

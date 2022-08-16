@@ -1,5 +1,6 @@
 package com.neppplus.keepthetime_20220816.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.neppplus.keepthetime_20220816.R
+import com.neppplus.keepthetime_20220816.SearchUserActivity
 import com.neppplus.keepthetime_20220816.adapters.FriendRecyclerViewAdapter
 import com.neppplus.keepthetime_20220816.databinding.FragmentMyFriendsBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
@@ -39,7 +41,10 @@ class MyFriendFragment: BaseFragment() {
     }
 
     override fun setupEvents() {
-
+        binding.addFriendBtn.setOnClickListener {
+            val myIntent = Intent(mContext, SearchUserActivity::class.java)
+            startActivity(myIntent)
+        }
     }
 
     override fun setValues() {

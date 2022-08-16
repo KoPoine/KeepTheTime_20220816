@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.neppplus.keepthetime_20220816.databinding.ActivitySignUpBinding
+import com.neppplus.keepthetime_20220816.datas.BasicResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignUpActivity : BaseActivity() {
 
@@ -57,7 +61,26 @@ class SignUpActivity : BaseActivity() {
             }
 
 //            서버에 연결 (회원가입 진행)
+            apiList.putRequestSignUp(
+                inputEmail, inputPw, inputNick
+            ).enqueue(object : Callback<BasicResponse>{
+                override fun onResponse(
+                    call: Call<BasicResponse>,
+                    response: Response<BasicResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val br = response.body()!!
+                        Toast.makeText(mContext, "~~님 가입을 축하합니다.", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
 
+                    }
+                }
+
+                override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+                }
+            })
 
 
         }

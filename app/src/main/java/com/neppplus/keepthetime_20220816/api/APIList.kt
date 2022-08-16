@@ -20,4 +20,11 @@ interface APIList {
         @Query("value") value : String
     ): Call<BasicResponse>
 
+    @FormUrlEncoded
+    @POST("/user")
+    fun postRequestLogin(
+        @Field("email") email : String,
+        @Field("password") password : String
+    ): Call<BasicResponse>
+
 }

@@ -1,6 +1,7 @@
 package com.neppplus.keepthetime_20220816.api
 
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -30,6 +31,13 @@ interface APIList {
     @GET("/user")
     fun getRequestMyInfo(
         @Header("X-Http-Token") token: String
+    ): Call<BasicResponse>
+
+    @Multipart
+    @PUT("/user/image")
+    fun putRequestUserImg(
+        @Header("X-Http-Token") token: String,
+        @Part img : MultipartBody.Part
     ): Call<BasicResponse>
 
 }

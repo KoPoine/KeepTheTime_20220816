@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.neppplus.keepthetime_20220816.databinding.ActivityLoginBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
+import com.neppplus.keepthetime_20220816.utils.ContextUtil
+import com.neppplus.keepthetime_20220816.utils.GlobalData
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,6 +39,11 @@ class LoginActivity : BaseActivity() {
                         val br = response.body()!!
 
                         Toast.makeText(mContext, "${br.data.user.nickname}님 환영합니다.", Toast.LENGTH_SHORT).show()
+
+                        GlobalData.loginUser = br.data.user
+
+                        ContextUtil.setAutoLogin(mContext, binding.autoLoginCb.isChecked)
+                        ContextUtil.setLoginToken(mContext, br.data.token)
 
                         val myIntent = Intent(mContext, MainActivity::class.java)
                         startActivity(myIntent)

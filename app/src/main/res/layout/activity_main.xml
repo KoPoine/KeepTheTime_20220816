@@ -8,11 +8,10 @@
         android:orientation="vertical"
         tools:context=".MainActivity">
 
-        <LinearLayout
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/mainViewPager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
             android:layout_weight="1"/>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView

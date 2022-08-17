@@ -55,7 +55,7 @@ class FriendRecyclerViewAdapter(
             }
 
             positiveBtn.setOnClickListener {
-                (mContext as MyFriendActivity).apiList.
+//                (mContext as MyFriendActivity).apiList.
             }
             negativeBtn.setOnClickListener {  }
         }

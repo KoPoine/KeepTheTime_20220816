@@ -26,7 +26,7 @@ class SplashActivity : BaseActivity() {
 
     override fun setupEvents() {
         val token = ContextUtil.getLoginToken(mContext)
-        apiList.getRequestMyInfo(token).enqueue(object : Callback<BasicResponse>{
+        apiList.getRequestMyInfo().enqueue(object : Callback<BasicResponse>{
             override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                 if (response.isSuccessful) {
                     isTokenOk = true

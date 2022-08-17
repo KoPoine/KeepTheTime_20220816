@@ -46,7 +46,7 @@ class SearchUserActivity : BaseActivity() {
     fun searchUserFromServer(inputNick : String) {
         val token = ContextUtil.getLoginToken(mContext)
         apiList.getRequestSearchUser(
-            token, inputNick
+            inputNick
         ).enqueue(object : Callback<BasicResponse>{
             override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                 if (response.isSuccessful) {

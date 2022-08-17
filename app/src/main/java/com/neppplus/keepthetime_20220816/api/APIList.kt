@@ -30,20 +30,17 @@ interface APIList {
 
     @GET("/user")
     fun getRequestMyInfo(
-        @Header("X-Http-Token") token: String
     ): Call<BasicResponse>
 
     @Multipart
     @PUT("/user/image")
     fun putRequestUserImg(
-        @Header("X-Http-Token") token: String,
         @Part img : MultipartBody.Part
     ): Call<BasicResponse>
 
     @FormUrlEncoded
     @PATCH("/user")
     fun patchRequestEditUserData(
-        @Header("X-Http-Token") token: String,
         @Field("field") field: String,
         @Field("value") value: String
     ): Call<BasicResponse>
@@ -51,34 +48,29 @@ interface APIList {
     @FormUrlEncoded
     @PATCH("/user/password")
     fun patchRequestChangePassword(
-        @Header("X-Http-Token") token: String,
         @Field("current_password") currentPw: String,
         @Field("new_password") newPw: String
     ): Call<BasicResponse>
 
     @GET("/user/friend")
     fun getRequestFriendList(
-        @Header("X-Http-Token") token: String,
         @Query("type") type : String
     ): Call<BasicResponse>
 
     @GET("/search/user")
     fun getRequestSearchUser(
-        @Header("X-Http-Token") token: String,
         @Query("nickname") nickname : String
     ): Call<BasicResponse>
 
     @FormUrlEncoded
     @POST("/user/friend")
     fun postRequestAddFriend(
-        @Header("X-Http-Token") token: String,
         @Field("user_id") id : Int
     ): Call<BasicResponse>
 
     @FormUrlEncoded
     @PUT("/user/friend")
     fun putRequestAddFriend(
-        @Header("X-Http-Token") token: String,
         @Field("user_id") id:Int,
         @Field("type") type : String
     ) : Call<BasicResponse>

@@ -62,7 +62,7 @@ class SearchUserRecyclerViewAdapter(
 
 //                2. context를 통해서 Activity에서 받아오기
                 val token = ContextUtil.getLoginToken(mContext)
-                (mContext as SearchUserActivity).apiList.postRequestAddFriend(token, item.id).enqueue(object : Callback<BasicResponse>{
+                (mContext as SearchUserActivity).apiList.postRequestAddFriend(item.id).enqueue(object : Callback<BasicResponse>{
                     override fun onResponse(
                         call: Call<BasicResponse>,
                         response: Response<BasicResponse>

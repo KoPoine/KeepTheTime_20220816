@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.MapFragment
+import com.naver.maps.map.overlay.Marker
 import com.neppplus.keepthetime_20220816.databinding.ActivityAddAppointmentBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import retrofit2.Call
@@ -13,6 +16,9 @@ import retrofit2.Response
 class AddAppointmentActivity : BaseActivity() {
 
     lateinit var binding : ActivityAddAppointmentBinding
+
+//    약속 장소를 담고있는 관련 변수
+    var mSelectedLatLng : LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +60,10 @@ class AddAppointmentActivity : BaseActivity() {
             }
 
 //            2) 실제 도착 지점을 선택했는가? => 네이버 지도 맵에서 도착 장소를 지정 했는가?
+            if (mSelectedLatLng == null) {
+                Toast.makeText(mContext, "약속 장소를 지도에서 선택해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
 //            apiList.postRequestAddAppointment(
 //                inputTitle, , inputPlaceName,
@@ -69,11 +79,38 @@ class AddAppointmentActivity : BaseActivity() {
 //
 //                }
 //            })
-
         }
+
+//        지도 영역에 손을 대면(setOnTouch) => 스크롤 뷰를 정지
+//        대안 : 지도 위에 텍스트뷰를 겹쳐두고, 텍스트뷰에 손을 대면 => 스크롤뷰를 정지
+        binding.scrollHelpTxt.setOnTouchListener { view, motionEvent ->
+
+            binding.scrollView.requestDisallowInterceptTouchEvent(true)
+
+//            터치 이벤트만 먹히게 할거냐? => no / 뒤에 있는 지도 동작도 같이 실행
+            return@setOnTouchListener false
+        }
+
     }
 
     override fun setValues() {
 
+        val fm = supportFragmentManager
+        val mapFragment = fm.findFragmentById(R.id.map) as MapFragment?
+            ?: MapFragment.newInstance().also {
+                fm.beginTransaction().add(R.id.map, it).commit()
+            }
+
+        mapFragment.getMapAsync {
+            val naverMap = it
+
+            val marker = Marker()
+
+            naverMap.setOnMapClickListener { pointF, latLng ->
+                mSelectedLatLng = latLng
+                marker.position = latLng
+                marker.map = naverMap
+            }
+        }
     }
 }

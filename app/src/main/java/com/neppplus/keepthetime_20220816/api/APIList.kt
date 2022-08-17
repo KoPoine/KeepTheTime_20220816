@@ -92,4 +92,9 @@ interface APIList {
     fun patchRequestEditPlace(
         @Field("place_id") id: Int
     ): Call<BasicResponse>
+
+    @DELETE("/user/place")
+    fun deleteRequestPlace(
+        @Query("place_id") id: Int
+    ): Call<BasicResponse>
 }

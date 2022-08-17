@@ -39,17 +39,40 @@ class PlaceRecyclerAdapter(
             }
 
             itemView.setOnClickListener {
+//                [도전과제] 롱클릭 이벤트 시 alert으로 삭제 / 기본출발지로 수정 / 취소
+//                1. button자체도 customView에다가 넣어서 커스텀 진행
+//                2. positive / negative / 제 3의 버튼을 열어서 진행
+
 //                기본 값 변경 이벤트
+//                (mContext as MyPlaceActivity).apiList
+//                    .patchRequestEditPlace(
+//                        item.id
+//                    ).enqueue(object : Callback<BasicResponse>{
+//                        override fun onResponse(
+//                            call: Call<BasicResponse>,
+//                            response: Response<BasicResponse>
+//                        ) {
+//                            if (response.isSuccessful) {
+//                                Toast.makeText(mContext, "기본 출발 장소가 변경되었습니다.", Toast.LENGTH_SHORT)
+//                                    .show()
+//                                mContext.getPlaceListFromServer()
+//                            }
+//                        }
+//
+//                        override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+//
+//                        }
+//                    })
+
+//                삭제 처리
                 (mContext as MyPlaceActivity).apiList
-                    .patchRequestEditPlace(
-                        item.id
-                    ).enqueue(object : Callback<BasicResponse>{
+                    .deleteRequestPlace(item.id).enqueue(object : Callback<BasicResponse>{
                         override fun onResponse(
                             call: Call<BasicResponse>,
                             response: Response<BasicResponse>
                         ) {
                             if (response.isSuccessful) {
-                                Toast.makeText(mContext, "기본 출발 장소가 변경되었습니다.", Toast.LENGTH_SHORT)
+                                Toast.makeText(mContext, "해당 출발지가 삭제되었습니다.", Toast.LENGTH_SHORT)
                                     .show()
                                 mContext.getPlaceListFromServer()
                             }

@@ -97,4 +97,14 @@ interface APIList {
     fun deleteRequestPlace(
         @Query("place_id") id: Int
     ): Call<BasicResponse>
+
+    @FormUrlEncoded
+    @POST("/appointment")
+    fun postRequestAddAppointment(
+        @Field("title") title : String,
+        @Field("datetime") datetime : String,
+        @Field("place") place : String,
+        @Field("latitude") latitude : Double,
+        @Field("longitude") longitude : Double,
+    ): Call<BasicResponse>
 }

@@ -16,10 +16,7 @@ import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
-import com.neppplus.keepthetime_20220816.LoginActivity
-import com.neppplus.keepthetime_20220816.MyFriendActivity
-import com.neppplus.keepthetime_20220816.MyPlaceActivity
-import com.neppplus.keepthetime_20220816.R
+import com.neppplus.keepthetime_20220816.*
 import com.neppplus.keepthetime_20220816.databinding.FragmentSettingBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import com.neppplus.keepthetime_20220816.utils.ContextUtil
@@ -197,7 +194,7 @@ class SettingFragment : BaseFragment() {
         }
 
         binding.editMyPlaceLayout.setOnClickListener {
-            val myIntent = Intent(mContext, MyPlaceActivity::class.java)
+            val myIntent = Intent(mContext, AddMyPlaceActivity::class.java)
             startActivity(myIntent)
         }
 

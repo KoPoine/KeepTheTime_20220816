@@ -86,4 +86,10 @@ interface APIList {
         @Field("longitude") longitude : Double,
         @Field("is_primary") isPrimary : String,
     ): Call<BasicResponse>
+
+    @FormUrlEncoded
+    @PATCH("/user/place")
+    fun patchRequestEditPlace(
+        @Field("place_id") id: Int
+    ): Call<BasicResponse>
 }

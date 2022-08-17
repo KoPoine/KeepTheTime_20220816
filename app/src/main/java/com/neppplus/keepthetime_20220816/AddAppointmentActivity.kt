@@ -1,7 +1,12 @@
 package com.neppplus.keepthetime_20220816
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.DatePicker
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.naver.maps.geometry.LatLng
@@ -12,6 +17,8 @@ import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddAppointmentActivity : BaseActivity() {
 
@@ -19,6 +26,9 @@ class AddAppointmentActivity : BaseActivity() {
 
 //    약속 장소를 담고있는 관련 변수
     var mSelectedLatLng : LatLng? = null
+
+//    선택된 약속 일시를 저장할 변수
+    var mSelectedDateTime = Calendar.getInstance() // 기본값 : 현재 시간
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +38,61 @@ class AddAppointmentActivity : BaseActivity() {
     }
 
     override fun setupEvents() {
+        var serverDateTime = ""
+
+//        날짜 선택
+        binding.dateTxt.setOnClickListener {
+            val dl = object : DatePickerDialog.OnDateSetListener{
+                override fun onDateSet(p0: DatePicker?, year: Int, month: Int, date: Int) {
+
+//                    날짜가 선택되고 나면 진행 할 일을 작성
+                    Log.d("선택된 시간", "${year}년, ${month}월, ${date}일")
+
+                    mSelectedDateTime.set(year, month, date)
+                    val sdf = SimpleDateFormat("yyyy. M. dd (E)")
+                    Log.d("변환된 시간", sdf.format(mSelectedDateTime.time))
+
+                    binding.dateTxt.text = sdf.format(mSelectedDateTime.time)
+                }
+            }
+
+
+
+//            DatePickerDialog 팝업
+            val dpd = DatePickerDialog(
+                mContext,
+                dl,
+                mSelectedDateTime.get(Calendar.YEAR),
+                mSelectedDateTime.get(Calendar.MONTH),
+                mSelectedDateTime.get(Calendar.DAY_OF_MONTH),
+            ).show()
+        }
+
+//        시간 선택
+        binding.timeTxt.setOnClickListener {
+            val tl = object : TimePickerDialog.OnTimeSetListener{
+                override fun onTimeSet(p0: TimePicker?, hour: Int, minute: Int) {
+                    Log.d("선택된 시간", "${hour}시, ${minute}분")
+
+                    mSelectedDateTime.set(Calendar.HOUR_OF_DAY, hour)
+                    mSelectedDateTime.set(Calendar.MINUTE, minute)
+
+                    val sdf = SimpleDateFormat("a h:mm")
+                    binding.timeTxt.text = sdf.format(mSelectedDateTime.time)
+                }
+            }
+
+            val tpd = TimePickerDialog(
+                mContext,
+                tl,
+                mSelectedDateTime.get(Calendar.HOUR),
+                mSelectedDateTime.get(Calendar.MINUTE),
+                false
+            ).show()
+        }
+
+
+
         binding.saveBtn.setOnClickListener {
 //            1. 약속의 제목을 정했는가?
             val inputTitle = binding.titleEdt.text.toString()
@@ -49,7 +114,10 @@ class AddAppointmentActivity : BaseActivity() {
             }
 
 //            지금 시간과 선택된 시간과의 계산
-
+            if (mSelectedDateTime.timeInMillis < Calendar.getInstance().timeInMillis) {
+                Toast.makeText(mContext, "현재 시간 이후의 시간으로 선택해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
 //            3. 도착 지점을 선택했는가?
 //            1) 약속 장소명을 기록 했는가?
@@ -65,20 +133,24 @@ class AddAppointmentActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-//            apiList.postRequestAddAppointment(
-//                inputTitle, , inputPlaceName,
-//            ).enqueue(object : Callback<BasicResponse>{
-//                override fun onResponse(
-//                    call: Call<BasicResponse>,
-//                    response: Response<BasicResponse>
-//                ) {
-//
-//                }
-//
-//                override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-//
-//                }
-//            })
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm")
+
+            apiList.postRequestAddAppointment(
+                inputTitle, sdf.format(mSelectedDateTime.time), inputPlaceName,
+                mSelectedLatLng!!.latitude, mSelectedLatLng!!.longitude
+            ).enqueue(object : Callback<BasicResponse>{
+                override fun onResponse(
+                    call: Call<BasicResponse>,
+                    response: Response<BasicResponse>
+                ) {
+                    Toast.makeText(mContext, "약속이 등록되었습니다.", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+
+                override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+                }
+            })
         }
 
 //        지도 영역에 손을 대면(setOnTouch) => 스크롤 뷰를 정지

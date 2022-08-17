@@ -1,6 +1,7 @@
 package com.neppplus.keepthetime_20220816.datas
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class PlaceData(
     val id : Int,
@@ -9,4 +10,4 @@ data class PlaceData(
     val longitude : Double,
     @SerializedName("is_primary")
     val isPrimary : Boolean
-)
+) : Serializable

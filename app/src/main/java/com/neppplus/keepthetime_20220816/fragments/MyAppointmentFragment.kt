@@ -1,10 +1,12 @@
 package com.neppplus.keepthetime_20220816.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import com.neppplus.keepthetime_20220816.AddAppointmentActivity
 import com.neppplus.keepthetime_20220816.R
 import com.neppplus.keepthetime_20220816.databinding.FragmentMyAppointmentBinding
 
@@ -28,7 +30,10 @@ class MyAppointmentFragment : BaseFragment() {
     }
 
     override fun setupEvents() {
-
+        binding.addAppointBtn.setOnClickListener {
+            val myIntent = Intent(mContext, AddAppointmentActivity::class.java)
+            startActivity(myIntent)
+        }
     }
 
     override fun setValues() {

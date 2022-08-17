@@ -4,16 +4,17 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.neppplus.keepthetime_20220816.MyFriendActivity
 import com.neppplus.keepthetime_20220816.R
+import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import com.neppplus.keepthetime_20220816.datas.UserData
 import com.neppplus.keepthetime_20220816.fragments.RequestedFriendFragment
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 // 내 친구 목록 & 요청 받은 목록 두 가지 동시표현하는 RecyclerViewAdapter
 
@@ -54,10 +55,44 @@ class FriendRecyclerViewAdapter(
                 buttonLayout.visibility = View.VISIBLE
             }
 
-            positiveBtn.setOnClickListener {
-//                (mContext as MyFriendActivity).apiList.
+//            수락 / 거절 버튼 둘다 하는일이 동일 => type에 들어갈 값만 다르다.
+//            버튼에 type을 정해놓고(tag) 인터페이스로 가져와서 사용하자.
+            val ocl = object : View.OnClickListener{
+                override fun onClick(p0: View?) {
+                    val type = p0!!.tag.toString()
+                    (mContext as MyFriendActivity).apiList.putRequestAddFriend(
+                        item.id, type
+                    ).enqueue(object : Callback<BasicResponse>{
+                        override fun onResponse(
+                            call: Call<BasicResponse>,
+                            response: Response<BasicResponse>
+                        ) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(
+                                    mContext,
+                                    "${item.nickname}님의 친구 추가 요청을 ${type}하였습니다.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+                        }
+                    })
+
+//                requestFriendList를 갱신
+//                프래그먼트의 친구요청목록(getRequestFriendListFromServer) 함수 실행?
+
+//                ViewPager2에서 fragment를 찾아 리스트 갱신
+//                ViewPager2에서는 내부의 fragment를 tag("f"+index)값을 통해서 찾아올예정
+                    ((mContext as MyFriendActivity).supportFragmentManager
+                        .findFragmentByTag("f1") as RequestedFriendFragment)
+                        .getRequestFriendListFromServer()
+                }
             }
-            negativeBtn.setOnClickListener {  }
+            positiveBtn.setOnClickListener(ocl)
+            negativeBtn.setOnClickListener(ocl)
         }
     }
 

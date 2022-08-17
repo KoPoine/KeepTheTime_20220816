@@ -194,7 +194,7 @@ class SettingFragment : BaseFragment() {
         }
 
         binding.editMyPlaceLayout.setOnClickListener {
-            val myIntent = Intent(mContext, AddMyPlaceActivity::class.java)
+            val myIntent = Intent(mContext, MyPlaceActivity::class.java)
             startActivity(myIntent)
         }
 

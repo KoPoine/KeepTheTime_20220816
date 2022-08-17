@@ -1,5 +1,6 @@
 package com.neppplus.keepthetime_20220816
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
@@ -25,16 +26,22 @@ class MyPlaceActivity : BaseActivity() {
         setValues()
     }
 
-    override fun setupEvents() {
+    override fun onResume() {
+        super.onResume()
+        getPlaceListFromServer()
+    }
 
+    override fun setupEvents() {
+        binding.addPlaceBtn.setOnClickListener {
+            val myIntent = Intent(mContext, AddMyPlaceActivity::class.java)
+            startActivity(myIntent)
+        }
     }
 
     override fun setValues() {
         mPlaceAdapter = PlaceRecyclerAdapter(mContext, mPlaceList)
         binding.placeRecyclerView.adapter = mPlaceAdapter
         binding.placeRecyclerView.layoutManager = LinearLayoutManager(mContext)
-
-        getPlaceListFromServer()
     }
 
     fun getPlaceListFromServer() {

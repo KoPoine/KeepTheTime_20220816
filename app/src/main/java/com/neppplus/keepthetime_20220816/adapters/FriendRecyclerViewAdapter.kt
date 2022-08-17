@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.neppplus.keepthetime_20220816.MyFriendActivity
 import com.neppplus.keepthetime_20220816.R
 import com.neppplus.keepthetime_20220816.datas.UserData
+import com.neppplus.keepthetime_20220816.fragments.RequestedFriendFragment
 
 // 내 친구 목록 & 요청 받은 목록 두 가지 동시표현하는 RecyclerViewAdapter
 
@@ -54,7 +55,7 @@ class FriendRecyclerViewAdapter(
             }
 
             positiveBtn.setOnClickListener {
-
+                (mContext as MyFriendActivity).apiList.
             }
             negativeBtn.setOnClickListener {  }
         }

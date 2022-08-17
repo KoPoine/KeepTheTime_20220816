@@ -74,4 +74,7 @@ interface APIList {
         @Field("user_id") id:Int,
         @Field("type") type : String
     ) : Call<BasicResponse>
+
+    @GET("/user/place")
+    fun getRequestUserPlace(): Call<BasicResponse>
 }

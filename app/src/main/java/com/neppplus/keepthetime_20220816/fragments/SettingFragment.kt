@@ -18,6 +18,7 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.neppplus.keepthetime_20220816.LoginActivity
 import com.neppplus.keepthetime_20220816.MyFriendActivity
+import com.neppplus.keepthetime_20220816.MyPlaceActivity
 import com.neppplus.keepthetime_20220816.R
 import com.neppplus.keepthetime_20220816.databinding.FragmentSettingBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
@@ -192,6 +193,11 @@ class SettingFragment : BaseFragment() {
 //        친구 목록 관리
         binding.editMyFriendLayout.setOnClickListener {
             val myIntent = Intent(mContext, MyFriendActivity::class.java)
+            startActivity(myIntent)
+        }
+
+        binding.editMyPlaceLayout.setOnClickListener {
+            val myIntent = Intent(mContext, MyPlaceActivity::class.java)
             startActivity(myIntent)
         }
 

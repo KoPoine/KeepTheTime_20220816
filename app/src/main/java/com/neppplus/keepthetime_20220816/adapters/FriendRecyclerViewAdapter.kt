@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.neppplus.keepthetime_20220816.MyFriendActivity
 import com.neppplus.keepthetime_20220816.R
 import com.neppplus.keepthetime_20220816.datas.UserData
 

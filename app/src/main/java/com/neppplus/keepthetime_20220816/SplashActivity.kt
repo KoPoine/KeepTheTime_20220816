@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
+import com.kakao.sdk.common.util.Utility
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import com.neppplus.keepthetime_20220816.utils.ContextUtil
 import com.neppplus.keepthetime_20220816.utils.GlobalData
@@ -41,6 +43,8 @@ class SplashActivity : BaseActivity() {
     }
 
     override fun setValues() {
+        getKeyHash()
+
         val myHandler = Handler(Looper.getMainLooper())
 
         myHandler.postDelayed(
@@ -59,5 +63,11 @@ class SplashActivity : BaseActivity() {
                 finish()
             }, 2000
         )
+    }
+
+    fun getKeyHash() {
+        var keyHash = Utility.getKeyHash(mContext)
+
+        Log.d("keyHash", keyHash)
     }
 }

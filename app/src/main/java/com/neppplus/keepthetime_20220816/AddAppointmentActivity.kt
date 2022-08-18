@@ -12,13 +12,16 @@ import androidx.databinding.DataBindingUtil
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.overlay.Marker
+import com.neppplus.keepthetime_20220816.adapters.PlaceSpinnerAdapter
 import com.neppplus.keepthetime_20220816.databinding.ActivityAddAppointmentBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
+import com.neppplus.keepthetime_20220816.datas.PlaceData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class AddAppointmentActivity : BaseActivity() {
 
@@ -29,6 +32,10 @@ class AddAppointmentActivity : BaseActivity() {
 
 //    선택된 약속 일시를 저장할 변수
     var mSelectedDateTime = Calendar.getInstance() // 기본값 : 현재 시간
+
+//    출발 장소 관련 변수
+    lateinit var mPlaceSpinnerAdapter : PlaceSpinnerAdapter
+    val mStartPlaceList = ArrayList<PlaceData>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,6 +174,11 @@ class AddAppointmentActivity : BaseActivity() {
 
     override fun setValues() {
 
+        mPlaceSpinnerAdapter = PlaceSpinnerAdapter(mContext, R.layout.place_list_item, mStartPlaceList)
+        binding.startPlaceSpinner.adapter = mPlaceSpinnerAdapter
+
+        getStartPlaceDataFromServer()
+
         val fm = supportFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map) as MapFragment?
             ?: MapFragment.newInstance().also {
@@ -184,5 +196,23 @@ class AddAppointmentActivity : BaseActivity() {
                 marker.map = naverMap
             }
         }
+    }
+
+    fun getStartPlaceDataFromServer() {
+        apiList.getRequestUserPlace().enqueue(object : Callback<BasicResponse>{
+            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                if (response.isSuccessful) {
+
+                    mStartPlaceList.clear()
+                    mStartPlaceList.addAll(response.body()!!.data.places)
+                    mPlaceSpinnerAdapter.notifyDataSetChanged()
+
+                }
+            }
+
+            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+            }
+        })
     }
 }

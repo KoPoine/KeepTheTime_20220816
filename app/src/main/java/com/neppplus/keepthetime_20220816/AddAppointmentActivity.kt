@@ -5,13 +5,18 @@ import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
+import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.OverlayImage
 import com.neppplus.keepthetime_20220816.adapters.PlaceSpinnerAdapter
 import com.neppplus.keepthetime_20220816.databinding.ActivityAddAppointmentBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
@@ -36,6 +41,13 @@ class AddAppointmentActivity : BaseActivity() {
 //    출발 장소 관련 변수
     lateinit var mPlaceSpinnerAdapter : PlaceSpinnerAdapter
     val mStartPlaceList = ArrayList<PlaceData>()
+    lateinit var mStartPlace : PlaceData
+
+//    네이버 지도 관련 변수
+    var mNaverMap : NaverMap? = null
+    var mStartPlaceMarker = Marker()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,8 +110,35 @@ class AddAppointmentActivity : BaseActivity() {
             ).show()
         }
 
+//        시작장소 스피너 선택 이벤트
+        binding.startPlaceSpinner
+            .onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, postion: Int, p3: Long) {
+//                Log.d("Spinner 변수 값", "p2 : $postion, p3 : $p3")
+                mStartPlace = mStartPlaceList[postion]
 
+                Log.d("출발장소", mStartPlace.toString())
 
+//                네이버 지도에 출발지 표시
+                mNaverMap?.let {
+                    mStartPlaceMarker.position = LatLng(mStartPlace.latitude, mStartPlace.longitude)
+                    mStartPlaceMarker.map = mNaverMap
+
+                    Log.d("출발장소", mStartPlace.toString())
+
+                    val cameraUpdate = CameraUpdate
+                        .scrollTo(LatLng(mStartPlace.latitude, mStartPlace.longitude))
+                    mNaverMap!!.moveCamera(cameraUpdate)
+                }
+
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+        }
+
+//        약속 등록 이벤트
         binding.saveBtn.setOnClickListener {
 //            1. 약속의 제목을 정했는가?
             val inputTitle = binding.titleEdt.text.toString()
@@ -144,7 +183,8 @@ class AddAppointmentActivity : BaseActivity() {
 
             apiList.postRequestAddAppointment(
                 inputTitle, sdf.format(mSelectedDateTime.time), inputPlaceName,
-                mSelectedLatLng!!.latitude, mSelectedLatLng!!.longitude
+                mSelectedLatLng!!.latitude, mSelectedLatLng!!.longitude,
+                mStartPlace.name, mStartPlace.latitude, mStartPlace.longitude
             ).enqueue(object : Callback<BasicResponse>{
                 override fun onResponse(
                     call: Call<BasicResponse>,
@@ -186,14 +226,18 @@ class AddAppointmentActivity : BaseActivity() {
             }
 
         mapFragment.getMapAsync {
-            val naverMap = it
+
+            if (mNaverMap == null) {
+                mNaverMap = it
+            }
 
             val marker = Marker()
+            marker.icon = OverlayImage.fromResource(R.drawable.red_marker)
 
-            naverMap.setOnMapClickListener { pointF, latLng ->
+            mNaverMap!!.setOnMapClickListener { pointF, latLng ->
                 mSelectedLatLng = latLng
                 marker.position = latLng
-                marker.map = naverMap
+                marker.map = mNaverMap
             }
         }
     }

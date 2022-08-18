@@ -6,10 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
-import android.widget.DatePicker
-import android.widget.TimePicker
-import android.widget.Toast
+import android.widget.*
+import androidx.core.view.setPadding
 import androidx.databinding.DataBindingUtil
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
@@ -17,10 +15,13 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.neppplus.keepthetime_20220816.adapters.FriendSpinnerAdapter
 import com.neppplus.keepthetime_20220816.adapters.PlaceSpinnerAdapter
 import com.neppplus.keepthetime_20220816.databinding.ActivityAddAppointmentBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import com.neppplus.keepthetime_20220816.datas.PlaceData
+import com.neppplus.keepthetime_20220816.datas.UserData
+import com.neppplus.keepthetime_20220816.utils.SizeUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,6 +43,11 @@ class AddAppointmentActivity : BaseActivity() {
     lateinit var mPlaceSpinnerAdapter : PlaceSpinnerAdapter
     val mStartPlaceList = ArrayList<PlaceData>()
     lateinit var mStartPlace : PlaceData
+
+//    친구 추가 관련 변수
+    lateinit var mFriendSpinnerAdapter : FriendSpinnerAdapter
+    val mFriendList = ArrayList<UserData>()
+    val mSelectedFriendList = ArrayList<UserData>()
 
 //    네이버 지도 관련 변수
     var mNaverMap : NaverMap? = null
@@ -138,6 +144,40 @@ class AddAppointmentActivity : BaseActivity() {
             }
         }
 
+//        친구 추가 버튼 클릭 이벤트
+        binding.inviteFriendBtn.setOnClickListener {
+//            지금 선택된 친구가 누구인지 확인 (스피너의 지금 선택된 아이템의 position)
+            val selectedFriend = mFriendList[binding.friendSpinner.selectedItemPosition]
+
+//            지금 선택된 친구가 이미 선택이 되었는지 확인
+            if (mSelectedFriendList.contains(selectedFriend)) {
+                Toast.makeText(mContext, "이미 추가된 친구입니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+//            텍스트뷰 하나를 동적으로 생성(코틀린단에서 생성) => programmatically
+            val textView = TextView(mContext)
+
+            textView.text = selectedFriend.nickname
+            textView.setBackgroundResource(R.drawable.custom_rectangle_r4)
+
+//            텍스트뷰에 패딩을 설정
+            textView.setPadding(SizeUtil.dpToPx(mContext, 5f).toInt())
+
+//            만들어낸 텍스뷰의 이벤트 처리
+            textView.setOnClickListener {
+                binding.friendListLayout.removeView(textView)
+                mSelectedFriendList.remove(selectedFriend)
+//                Log.d("선택된 친구 목록 size", mSelectedFriendList.size.toString())
+            }
+
+            binding.friendListLayout.addView(textView)
+            mSelectedFriendList.add(selectedFriend)
+//            Log.d("선택된 친구 목록 size", mSelectedFriendList.size.toString())
+
+        }
+
+
 //        약속 등록 이벤트
         binding.saveBtn.setOnClickListener {
 //            1. 약속의 제목을 정했는가?
@@ -179,12 +219,28 @@ class AddAppointmentActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm")
+//            4. 선택한 친구 목록 => "1,3,4" 가공해서 첨부
+            var friendListStr = ""
+
+//            friendListStr에 들어갈 string을 선택된 친구들 목록에 가공
+            for (friend in mSelectedFriendList) {
+                friendListStr += friend.id
+                friendListStr += ","
+            }
+
+//            마지막 ,만 제거 => 글자가 0보다 커야 가능
+            if (friendListStr != "") {
+                friendListStr = friendListStr.substring(0,friendListStr.length - 1)
+            }
+            Log.d("친구 목록", friendListStr)
+
+           val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm")
 
             apiList.postRequestAddAppointment(
                 inputTitle, sdf.format(mSelectedDateTime.time), inputPlaceName,
                 mSelectedLatLng!!.latitude, mSelectedLatLng!!.longitude,
-                mStartPlace.name, mStartPlace.latitude, mStartPlace.longitude
+                mStartPlace.name, mStartPlace.latitude, mStartPlace.longitude,
+                friendListStr
             ).enqueue(object : Callback<BasicResponse>{
                 override fun onResponse(
                     call: Call<BasicResponse>,
@@ -217,7 +273,8 @@ class AddAppointmentActivity : BaseActivity() {
         mPlaceSpinnerAdapter = PlaceSpinnerAdapter(mContext, R.layout.place_list_item, mStartPlaceList)
         binding.startPlaceSpinner.adapter = mPlaceSpinnerAdapter
 
-        getStartPlaceDataFromServer()
+        mFriendSpinnerAdapter = FriendSpinnerAdapter(mContext, R.layout.friend_list_itme, mFriendList)
+        binding.friendSpinner.adapter = mFriendSpinnerAdapter
 
         val fm = supportFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map) as MapFragment?
@@ -240,6 +297,9 @@ class AddAppointmentActivity : BaseActivity() {
                 marker.map = mNaverMap
             }
         }
+
+        getStartPlaceDataFromServer()
+        getFriendListFromServer()
     }
 
     fun getStartPlaceDataFromServer() {
@@ -251,6 +311,22 @@ class AddAppointmentActivity : BaseActivity() {
                     mStartPlaceList.addAll(response.body()!!.data.places)
                     mPlaceSpinnerAdapter.notifyDataSetChanged()
 
+                }
+            }
+
+            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+            }
+        })
+    }
+
+    fun getFriendListFromServer() {
+        apiList.getRequestFriendList("my").enqueue(object : Callback<BasicResponse>{
+            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                if (response.isSuccessful) {
+                    mFriendList.clear()
+                    mFriendList.addAll(response.body()!!.data.friends)
+                    mFriendSpinnerAdapter.notifyDataSetChanged()
                 }
             }
 

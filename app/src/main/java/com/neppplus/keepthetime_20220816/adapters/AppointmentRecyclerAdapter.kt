@@ -20,13 +20,13 @@ class AppointmentRecyclerAdapter(
             val dateTimeTxt = itemView.findViewById<TextView>(R.id.dateTimeTxt)
             val placeTxt = itemView.findViewById<TextView>(R.id.placeTxt)
             val memberTxt = itemView.findViewById<TextView>(R.id.memberTxt)
-
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:ss")
-            val datetime = sdf.parse(item.datetime)
+//
+//            val sdf = SimpleDateFormat("yyyy-MM-dd HH:ss")
+//            val datetime = sdf.parse(item.datetime)
 
             val formatter = SimpleDateFormat("M/dd a h:ss")
             titleTxt.text = item.title
-            dateTimeTxt.text = formatter.format(datetime)
+            dateTimeTxt.text = formatter.format(item.datetime)
             placeTxt.text = "약속 장소 : ${item.place}"
             memberTxt.text = "참여 인원 : ${item.invitedFriends.size}명"
         }

@@ -2,6 +2,7 @@ package com.neppplus.keepthetime_20220816.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import com.neppplus.keepthetime_20220816.adapters.AppointmentRecyclerAdapter
 import com.neppplus.keepthetime_20220816.databinding.FragmentMyAppointmentBinding
 import com.neppplus.keepthetime_20220816.datas.AppointmentData
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -67,10 +69,17 @@ class MyAppointmentFragment : BaseFragment() {
 
                     mAppointAdapter.notifyDataSetChanged()
                 }
+                else {
+                    val errorBodyStr = response.errorBody()!!.string()
+                    val jsonObj = JSONObject(errorBodyStr)
+
+                    val message = jsonObj.getString("message")
+                    Log.d("파싱 에러", message)
+                }
             }
 
             override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-
+                Log.d("응답 에러", t.toString())
             }
         })
     }

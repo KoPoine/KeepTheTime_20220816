@@ -1,6 +1,7 @@
 package com.neppplus.keepthetime_20220816.api
 
 import android.content.Context
+import com.google.gson.GsonBuilder
 import com.neppplus.keepthetime_20220816.utils.ContextUtil
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -31,6 +32,10 @@ class ServerAPI {
                     }
                 }
 
+//                gson에게 날짜 양식을 어떻게 파싱할 건지 => 추가 기능을 가진 gson으로 생성
+                val gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss")
+                    .create()
+
 //                retrofit은 OkHttp의 확장판 => OkHttpClient 형태의 클라이언트를 활용
 //                클라이언트에게 우리가 만든 인터셉터를 달아주자.(클라이언트 커스터마이징)
                 val myClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
@@ -38,7 +43,7 @@ class ServerAPI {
                 retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(myClient)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build()
             }
             return retrofit!!

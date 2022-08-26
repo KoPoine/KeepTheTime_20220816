@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -172,17 +173,39 @@ class SettingFragment : BaseFragment() {
 
 //        로그아웃
         binding.logoutLayout.setOnClickListener {
-            ContextUtil.setLoginToken(mContext, "")
 
-            GlobalData.loginUser = null
+            val customView = LayoutInflater.from(mContext).inflate(R.layout.custom_alert_dialog, null)
 
-            val myIntent = Intent(mContext, LoginActivity::class.java)
-            myIntent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(myIntent)
+            val positiveBtn = customView.findViewById<Button>(R.id.positiveBtn)
+            val negativeBtn = customView.findViewById<Button>(R.id.negativeBtn)
 
-//            Fragment에서는 기존의 Activity를 종료할 수 없다.(Activity를 찾아와야...=> requireActivity())
-            requireActivity().finish()
+            val alert = AlertDialog.Builder(mContext)
+                .setMessage("로그아웃 하시겠습니까?")
+                .setView(customView)
+                .create()
+
+            positiveBtn.setOnClickListener {
+                Toast.makeText(mContext, "확인", Toast.LENGTH_SHORT).show()
+            }
+            negativeBtn.setOnClickListener {
+                Toast.makeText(mContext, "취소", Toast.LENGTH_SHORT).show()
+                alert.dismiss()
+            }
+
+            alert.show()
+
+
+//            ContextUtil.setLoginToken(mContext, "")
+//
+//            GlobalData.loginUser = null
+//
+//            val myIntent = Intent(mContext, LoginActivity::class.java)
+//            myIntent.flags =
+//                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            startActivity(myIntent)
+//
+////            Fragment에서는 기존의 Activity를 종료할 수 없다.(Activity를 찾아와야...=> requireActivity())
+//            requireActivity().finish()
 
 //            requireActivity().finishAffinity()
         }

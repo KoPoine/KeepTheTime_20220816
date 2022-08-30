@@ -1,6 +1,7 @@
 package com.neppplus.keepthetime_20220816.api
 
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
+import com.neppplus.keepthetime_20220816.datas.odsaydatas.ODSayResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.*
@@ -122,4 +123,15 @@ interface APIList {
         @Field("uid") uid : String,
         @Field("nick_name") nickname: String
     ): Call<BasicResponse>
+
+    @FormUrlEncoded
+    @POST("/v1/api/searchPubTransPathT")
+    fun getRequestFindWay(
+        @Field("apiKey") apiKey : String,
+        @Field("SX") SX : Double,
+        @Field("SY") SY : Double,
+        @Field("EX") EX : Double,
+        @Field("EY") EY : Double
+    ): Call<ODSayResponse>
+
 }

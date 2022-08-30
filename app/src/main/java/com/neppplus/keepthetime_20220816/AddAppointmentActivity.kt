@@ -2,7 +2,6 @@ package com.neppplus.keepthetime_20220816
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,17 +16,25 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.neppplus.keepthetime_20220816.adapters.FriendSpinnerAdapter
 import com.neppplus.keepthetime_20220816.adapters.PlaceSpinnerAdapter
+import com.neppplus.keepthetime_20220816.api.APIList
 import com.neppplus.keepthetime_20220816.databinding.ActivityAddAppointmentBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import com.neppplus.keepthetime_20220816.datas.PlaceData
 import com.neppplus.keepthetime_20220816.datas.UserData
+import com.neppplus.keepthetime_20220816.datas.odsaydatas.ODSayResponse
 import com.neppplus.keepthetime_20220816.utils.SizeUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AddAppointmentActivity : BaseActivity() {
 
@@ -300,6 +307,7 @@ class AddAppointmentActivity : BaseActivity() {
 
         getStartPlaceDataFromServer()
         getFriendListFromServer()
+        findWay()
     }
 
     fun getStartPlaceDataFromServer() {
@@ -331,6 +339,30 @@ class AddAppointmentActivity : BaseActivity() {
             }
 
             override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+
+            }
+        })
+    }
+
+    fun findWay() {
+        val apiKey = "PW9zs5Maojts5aUN+GzwR8XKcHoZ+o6IdAzADjxQ8/8"
+        val startLatLng = LatLng(37.6134436427887, 126.926493082645)
+        val endLatLng = LatLng(37.5004198786564, 127.126936754911)
+        val odsayRetrofit = Retrofit.Builder()
+            .baseUrl("https://api.odsay.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val api = odsayRetrofit.create(APIList::class.java)
+        api.getRequestFindWay(
+            apiKey, startLatLng.longitude, startLatLng.latitude, endLatLng.longitude, endLatLng.latitude
+        ).enqueue(object : Callback<ODSayResponse>{
+            override fun onResponse(call: Call<ODSayResponse>, response: Response<ODSayResponse>) {
+                if (response.isSuccessful) {
+                    Log.d("응답", response.body().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<ODSayResponse>, t: Throwable) {
 
             }
         })

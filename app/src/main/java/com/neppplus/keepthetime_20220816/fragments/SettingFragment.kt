@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +24,7 @@ import com.neppplus.keepthetime_20220816.databinding.FragmentSettingBinding
 import com.neppplus.keepthetime_20220816.datas.BasicResponse
 import com.neppplus.keepthetime_20220816.utils.ContextUtil
 import com.neppplus.keepthetime_20220816.utils.GlobalData
+import com.neppplus.keepthetime_20220816.utils.SizeUtil.Companion.writeBitmap
 import com.neppplus.keepthetime_20220816.utils.URIPathHelper
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -75,7 +78,7 @@ class SettingFragment : BaseFragment() {
 
             TedPermission.create()
                 .setPermissionListener(pl)
-                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .check()
 
         }
@@ -246,6 +249,24 @@ class SettingFragment : BaseFragment() {
 //                Uri -> 실제 첨부 가능한 파일 형태로 변환 (File객체를 실제 Path를 통해서 만든다.)
                 val file = File(URIPathHelper().getPath(mContext, selectedImgUri))
 
+//                우리가 원하는 용량으로(1M) 줄이는 코드 > Bitmap
+//                val fileSize = file.length()   // 우리가 가져온 파일의 Size 확인
+                val maxImgSize = 1024000   // 줄이고자하는 목표 용량 (1M)
+
+//                원하는 용량이 될때까지 '반복' 해서 용량 압축
+                while (true) {
+                    val bitmap = BitmapFactory.decodeFile(file.path)
+                    var quality = 80
+                    file.writeBitmap(bitmap, Bitmap.CompressFormat.JPEG, quality)
+                    if (file.length() > maxImgSize) {
+                        quality -= 20
+                        file.writeBitmap(bitmap, Bitmap.CompressFormat.JPEG, quality)
+                    }
+                    else {
+                        break
+                    }
+                }
+
 //                완성된 파일을, Retrofit에 첨부 가능한 RequestBody 형태로 가공
                 val fileReqBody = RequestBody.create(MediaType.get("image/*"), file)
 
@@ -268,6 +289,7 @@ class SettingFragment : BaseFragment() {
                             GlobalData.loginUser = response.body()!!.data.user
                             Glide.with(mContext).load(selectedImgUri).into(binding.profileImg)
                         }
+
                     }
 
                     override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
